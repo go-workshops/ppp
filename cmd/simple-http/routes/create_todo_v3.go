@@ -3,7 +3,9 @@ package routes
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/go-workshops/ppp/cmd/simple-http/models"
 	sharedContext "github.com/go-workshops/ppp/pkg/context"
@@ -42,6 +44,7 @@ func createTodoV3(svc todoCreator) func(http.ResponseWriter, *http.Request) {
 		}
 
 		todo := models.Todo{
+			ID:          fmt.Sprintf("%d", time.Now().UnixNano()),
 			Title:       req.Title,
 			Description: req.Description,
 		}

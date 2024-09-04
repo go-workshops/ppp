@@ -20,6 +20,7 @@ func NewRouter(cfg Config) http.Handler {
 	mux.HandleFunc("/v1/todos", createTodoV1())
 	mux.HandleFunc("/v2/todos", createTodoV2())
 	mux.HandleFunc("/v3/todos", createTodoV3(cfg.TodosService))
+	mux.HandleFunc("/v4/todos", createTodoV4(cfg.TodosService))
 
 	return middleware.New(
 		mux,

@@ -19,9 +19,9 @@ func main() {
 		log.Fatalln("could not initialize logger:", err)
 	}
 
-	fileDB, err := db.OpenFile(".todos.db.json")
+	fileDB, err := db.OpenFS(".db")
 	if err != nil {
-		log.Fatalln("could not open file database:", err)
+		log.Fatalln("could not open fs database:", err)
 	}
 
 	todosSvc := services.NewTodo(fileDB)
