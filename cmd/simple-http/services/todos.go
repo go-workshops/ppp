@@ -30,7 +30,7 @@ func (s *Todo) CreateTodo(ctx context.Context, todo models.Todo) error {
 
 	err := json.NewEncoder(s.db.File(todo.ID + ".json")).Encode(todo)
 	if err != nil {
-		logger.Error("could not write todo to the db")
+		logger.Error("could not write todo to the db", zap.Error(err))
 		return err
 	}
 

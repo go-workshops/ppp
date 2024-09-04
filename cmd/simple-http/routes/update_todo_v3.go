@@ -13,19 +13,17 @@ func updateTodoV3(svc todoUpdater) func(http.ResponseWriter, *http.Request) {
 		ctx := r.Context()
 		logger := sharedContext.Logger(ctx)
 
-		// decoding update todo request
 		var req updateTodoRequestV3
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			logger.Error("could not decode json request body")
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
 
-		// validating update todo request
 		if !req.Validate(r, w) {
 			return
 		}
 
-		// updating todo model in the database
 		todo := models.Todo{ID: req.ID, Title: req.Title, Description: req.Description}
 		if err := svc.UpdateTodo(ctx, todo); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)

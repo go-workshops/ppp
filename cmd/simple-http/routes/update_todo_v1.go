@@ -21,6 +21,7 @@ func updateTodoV1(svc todoUpdater) func(http.ResponseWriter, *http.Request) {
 		logger.Info("decoding update todo request")
 		var req updateTodoRequestV1
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			logger.Error("could not decode json request body")
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
