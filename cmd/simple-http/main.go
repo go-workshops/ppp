@@ -1,13 +1,25 @@
 package main
 
 import (
+	"context"
 	"log"
+	"net"
 	"net/http"
+	"strconv"
+	"time"
+
+	"go.uber.org/zap"
 
 	"github.com/go-workshops/ppp/cmd/simple-http/routes"
 	"github.com/go-workshops/ppp/cmd/simple-http/services"
+	sharedContext "github.com/go-workshops/ppp/pkg/context"
 	"github.com/go-workshops/ppp/pkg/db"
 	"github.com/go-workshops/ppp/pkg/logging"
+)
+
+var (
+	revision  string
+	buildTime string
 )
 
 func main() {
@@ -29,5 +41,27 @@ func main() {
 	router := routes.NewRouter(routes.Config{
 		TodosService: todosSvc,
 	})
-	log.Fatalln(http.ListenAndServe(":8080", router))
+
+	logger := logging.GetLogger()
+	if revision != "" {
+		logger = logger.With(zap.String("revision", revision))
+	}
+	if buildTime != "" {
+		unixNano, err := strconv.ParseInt(buildTime, 10, 64)
+		if err != nil {
+			log.Fatalln("could not parse build time:", err)
+		}
+		if unixNano > 0 {
+			logger = logger.With(zap.Time("build_time", time.Unix(0, unixNano)))
+		}
+	}
+	ctx := sharedContext.WithLogger(context.Background(), logger)
+	srv := &http.Server{
+		Addr:    ":8080",
+		Handler: router,
+		BaseContext: func(net.Listener) context.Context {
+			return ctx
+		},
+	}
+	log.Fatalln(srv.ListenAndServe())
 }
