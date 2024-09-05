@@ -3,6 +3,7 @@ package logging
 import (
 	"os"
 	"sync"
+	"time"
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -56,6 +57,10 @@ type Config struct {
 	// Can be one of: "json" or "console". (default "json")
 	Encoding string
 
+	SamplingTick       time.Duration
+	SamplingFirst      int
+	SamplingThereafter int
+
 	// Core is the logger core. If not set, the default core will be used.
 	// This option is useful for testing purposes.
 	Core zapcore.Core
@@ -82,6 +87,31 @@ func Init(cfg Config) error {
 	if err != nil {
 		return err
 	}
+
+	samplingTick := cfg.SamplingTick
+	if samplingTick < 1 {
+		samplingTick = time.Second
+	}
+	samplingFirst := cfg.SamplingFirst
+	if samplingFirst < 1 {
+		samplingFirst = 100
+	}
+	samplingThereafter := cfg.SamplingThereafter
+	if samplingThereafter < 1 {
+		samplingThereafter = 100
+	}
+	logger = zap.New(
+		zapcore.NewSamplerWithOptions(
+			logger.Core(),
+			samplingTick,
+			samplingFirst,
+			samplingThereafter,
+		),
+		zap.AddCaller(),
+		zap.AddStacktrace(zapcore.ErrorLevel),
+	)
+
+	// TODO: this one is not right, need an external func
 	defer func() { _ = logger.Sync() }()
 
 	SetLogger(logger)
@@ -126,6 +156,7 @@ func newConfig(level, encoding string, output []string) (zap.Config, error) {
 	zapConfig.EncoderConfig.LevelKey = newKey(LevelKeyEnvVar, DefaultLevelKey)
 	zapConfig.EncoderConfig.TimeKey = newKey(TimeKeyEnvVar, DefaultTimeKey)
 	zapConfig.EncoderConfig.CallerKey = newKey(CallerKeyEnvVar, DefaultCallerKey)
+	zapConfig.Sampling = nil
 
 	return zapConfig, nil
 }

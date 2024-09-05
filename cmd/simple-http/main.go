@@ -47,10 +47,7 @@ func main() {
 		logger = logger.With(zap.String("revision", revision))
 	}
 	if buildTime != "" {
-		unixNano, err := strconv.ParseInt(buildTime, 10, 64)
-		if err != nil {
-			log.Fatalln("could not parse build time:", err)
-		}
+		unixNano, _ := strconv.ParseInt(buildTime, 10, 64)
 		if unixNano > 0 {
 			logger = logger.With(zap.Time("build_time", time.Unix(0, unixNano)))
 		}
