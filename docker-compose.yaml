@@ -1,5 +1,3 @@
-version: "3"
-
 services:
   # Used for navigating traces / spans
   tempo:

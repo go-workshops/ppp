@@ -27,14 +27,14 @@ func updateTodoV5(svc todoUpdater) func(http.ResponseWriter, *http.Request) {
 		}
 
 		logger = logger.With(zap.String("id", req.ID))
-		ctx = sharedContext.WithLogger(ctx, logger.With(zap.String("id", req.ID)))
+		ctx = sharedContext.WithLogger(ctx, logger)
 		todo := models.Todo{ID: req.ID, Title: req.Title, Description: req.Description}
 		if err := svc.UpdateTodo(ctx, todo); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 
-		logger.Info("successfully updated todo", zap.String("id", todo.ID))
+		logger.Info("successfully updated todo")
 		w.WriteHeader(http.StatusOK)
 	}
 }

@@ -33,7 +33,8 @@ func NewRouter(cfg Config) http.Handler {
 	return middleware.New(
 		mux,
 		// middleware.RequestDumpV1,
-		middleware.RequestDumpV2,
+		//middleware.RequestDumpV2,
+		middleware.RequestDumpV3,
 		// ...
 	)
 }
