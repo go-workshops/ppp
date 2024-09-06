@@ -30,6 +30,7 @@ func main() {
 	if err != nil {
 		log.Fatalln("could not initialize logger:", err)
 	}
+	defer logging.Sync()
 
 	fileDB, err := db.OpenFS(".db")
 	if err != nil {

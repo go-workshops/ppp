@@ -64,6 +64,10 @@ type Config struct {
 	// Core is the logger core. If not set, the default core will be used.
 	// This option is useful for testing purposes.
 	Core zapcore.Core
+
+	BufferingEnabled       bool
+	BufferingSize          int
+	BufferingFlushInterval time.Duration
 }
 
 // Init initializes application logger
@@ -78,14 +82,43 @@ func Init(cfg Config) error {
 		return err
 	}
 
-	logger, err := zapConfig.Build(zap.WrapCore(func(core zapcore.Core) zapcore.Core {
-		if cfg.Core != nil {
-			return cfg.Core
-		}
-		return core
-	}))
+	logger, err := zapConfig.Build()
 	if err != nil {
 		return err
+	}
+
+	if cfg.BufferingEnabled {
+		size := cfg.BufferingSize
+		if size < 1 {
+			size = 256 * 1024
+		}
+
+		flushInterval := cfg.BufferingFlushInterval
+		if flushInterval < 1 {
+			flushInterval = 30 * time.Second
+		}
+
+		ws, _, e := zap.Open(zapConfig.OutputPaths...)
+		bufferedWriteSyncer := &zapcore.BufferedWriteSyncer{
+			WS:            ws,
+			Size:          size,
+			FlushInterval: flushInterval,
+		}
+		if e != nil {
+			return e
+		}
+		logger = logger.WithOptions(zap.WrapCore(func(core zapcore.Core) zapcore.Core {
+			return zapcore.NewCore(
+				zapcore.NewJSONEncoder(zapConfig.EncoderConfig),
+				bufferedWriteSyncer,
+				zapConfig.Level,
+			)
+		}))
+	}
+	if cfg.Core != nil {
+		logger = logger.WithOptions(zap.WrapCore(func(core zapcore.Core) zapcore.Core {
+			return cfg.Core
+		}))
 	}
 
 	samplingTick := cfg.SamplingTick
@@ -111,9 +144,6 @@ func Init(cfg Config) error {
 		zap.AddStacktrace(zapcore.ErrorLevel),
 	)
 
-	// TODO: this one is not right, need an external func
-	defer func() { _ = logger.Sync() }()
-
 	SetLogger(logger)
 	return nil
 }
@@ -134,6 +164,12 @@ func GetLogger() *zap.Logger {
 	mu.Lock()
 	defer mu.Unlock()
 	return defaultLogger
+}
+
+func Sync() {
+	mu.Lock()
+	defer mu.Unlock()
+	_ = defaultLogger.Sync()
 }
 
 func newConfig(level, encoding string, output []string) (zap.Config, error) {
