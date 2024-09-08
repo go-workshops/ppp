@@ -15,7 +15,7 @@ type req struct {
 	Book   string
 }
 
-func work1(logger *zap.Logger, session db.Session, wg *sync.WaitGroup, limiter chan struct{}, r req) {
+func tx1(logger *zap.Logger, session db.Session, wg *sync.WaitGroup, limiter chan struct{}, r req) {
 	defer wg.Done()
 	defer func() { <-limiter }()
 	_ = session.Tx(func(sess db.Session) error {
@@ -41,7 +41,7 @@ func work1(logger *zap.Logger, session db.Session, wg *sync.WaitGroup, limiter c
 	})
 }
 
-func work2(logger *zap.Logger, session db.Session, wg *sync.WaitGroup, limiter chan struct{}, r req) {
+func tx2(logger *zap.Logger, session db.Session, wg *sync.WaitGroup, limiter chan struct{}, r req) {
 	defer wg.Done()
 	defer func() { <-limiter }()
 	_ = session.Tx(func(sess db.Session) error {

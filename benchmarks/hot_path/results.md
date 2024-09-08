@@ -24,8 +24,8 @@ ok      github.com/go-workshops/ppp/benchmarks/hot_path 41.573s
 goos: darwin
 goarch: arm64
 pkg: github.com/go-workshops/ppp/benchmarks/hot_path
-BenchmarkWork1-10          77217            156277 ns/op            5343 B/op        123 allocs/op        87318 DB records
-BenchmarkWork2-10          88407            139056 ns/op            5583 B/op        127 allocs/op        54308 DB records
+BenchmarkWork1-10          82740            139374 ns/op            5335 B/op        123 allocs/op        92841 DB records
+BenchmarkWork2-10          83820            145393 ns/op            5589 B/op        128 allocs/op        52014 DB records
 PASS
-ok      github.com/go-workshops/ppp/benchmarks/hot_path 40.842s
+ok      github.com/go-workshops/ppp/benchmarks/hot_path 42.737s
 ```

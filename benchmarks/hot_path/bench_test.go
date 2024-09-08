@@ -8,7 +8,7 @@ import (
 	"go.uber.org/zap"
 )
 
-func BenchmarkWork1(b *testing.B) {
+func BenchmarkTx1(b *testing.B) {
 	var wg sync.WaitGroup
 	cfg := zap.NewProductionConfig()
 	cfg.OutputPaths = []string{"zap1.log"}
@@ -24,7 +24,7 @@ func BenchmarkWork1(b *testing.B) {
 		go func(i int) {
 			defer wg.Done()
 			defer func() { <-limiter }()
-			work1(logger, session, &wg, limiter, req{
+			tx1(logger, session, &wg, limiter, req{
 				Author: fmt.Sprintf("Author %d", i),
 				Book:   fmt.Sprintf("Book %d", i),
 			})
@@ -33,7 +33,7 @@ func BenchmarkWork1(b *testing.B) {
 	wg.Wait()
 }
 
-func BenchmarkWork2(b *testing.B) {
+func BenchmarkTx2(b *testing.B) {
 	var wg sync.WaitGroup
 	cfg := zap.NewProductionConfig()
 	cfg.OutputPaths = []string{"zap2.log"}
@@ -49,7 +49,7 @@ func BenchmarkWork2(b *testing.B) {
 		go func(i int) {
 			defer wg.Done()
 			defer func() { <-limiter }()
-			work2(logger, session, &wg, limiter, req{
+			tx2(logger, session, &wg, limiter, req{
 				Author: fmt.Sprintf("Author %d", i),
 				Book:   fmt.Sprintf("Book %d", i),
 			})
