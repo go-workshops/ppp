@@ -60,6 +60,7 @@ func main() {
 		BaseContext: func(net.Listener) context.Context {
 			return ctx
 		},
+		ErrorLog: logging.HTTPErrorLogger(),
 	}
 	log.Fatalln(srv.ListenAndServe())
 }

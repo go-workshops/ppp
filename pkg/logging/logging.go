@@ -1,6 +1,7 @@
 package logging
 
 import (
+	"log"
 	"os"
 	"sync"
 	"time"
@@ -170,6 +171,19 @@ func Sync() {
 	mu.Lock()
 	defer mu.Unlock()
 	_ = defaultLogger.Sync()
+}
+
+func HTTPErrorLogger() *log.Logger {
+	return log.New(&httpErrorLogger{logger: GetLogger()}, "", 0)
+}
+
+type httpErrorLogger struct {
+	logger *zap.Logger
+}
+
+func (l *httpErrorLogger) Write(p []byte) (n int, err error) {
+	l.logger.Error(string(p))
+	return len(p), nil
 }
 
 func newConfig(level, encoding string, output []string) (zap.Config, error) {

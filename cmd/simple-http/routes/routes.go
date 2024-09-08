@@ -29,9 +29,11 @@ func NewRouter(cfg Config) http.Handler {
 	mux.HandleFunc("/v3/todos/update", updateTodoV3(cfg.TodosService))
 	mux.HandleFunc("/v4/todos/update", updateTodoV4(cfg.TodosService))
 	mux.HandleFunc("/v5/todos/update", updateTodoV5(cfg.TodosService))
+	mux.HandleFunc("/panics", createPanic())
 
 	return middleware.New(
 		mux,
+		middleware.Recovery,
 		// middleware.RequestDumpV1,
 		//middleware.RequestDumpV2,
 		middleware.RequestDumpV3,
