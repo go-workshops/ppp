@@ -59,8 +59,24 @@ services:
     ports:
       - "3000:3000"
 
+  pg:
+    image: postgres:alpine
+    container_name: pg
+    restart: on-failure
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+      - ./migrations/library.sql:/docker-entrypoint-initdb.d/library.sql
+
 volumes:
   tempo_data:
     driver: local
   loki_data:
+    driver: local
+  pg_data:
     driver: local
