@@ -11,7 +11,7 @@ import (
 func BenchmarkWithBuffering(b *testing.B) {
 	cfg := zap.NewProductionConfig()
 	cfg.EncoderConfig.EncodeTime = zapcore.EpochNanosTimeEncoder
-	cfg.OutputPaths = []string{"zap.log"}
+	cfg.OutputPaths = []string{"zap_buffered.log"}
 	cfg.Sampling = nil
 	logger, _ := cfg.Build()
 	ws, _, _ := zap.Open(cfg.OutputPaths...)
@@ -38,7 +38,7 @@ func BenchmarkWithBuffering(b *testing.B) {
 func BenchmarkWithoutBuffering(b *testing.B) {
 	cfg := zap.NewProductionConfig()
 	cfg.EncoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
-	cfg.OutputPaths = []string{"zap.log"}
+	cfg.OutputPaths = []string{"zap_unbuffered.log"}
 	cfg.Sampling = nil
 	logger, _ := cfg.Build()
 
