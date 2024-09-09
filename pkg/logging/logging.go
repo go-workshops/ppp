@@ -42,7 +42,7 @@ const (
 
 var (
 	defaultLogger = zap.NewExample()
-	mu            sync.Mutex
+	mu            sync.RWMutex
 )
 
 // Config represents logging configuration
@@ -154,17 +154,18 @@ func Init(cfg Config) error {
 // i.e: someContext.WithLogger(ctx, logger)
 func SetLogger(logger *zap.Logger) {
 	mu.Lock()
-	defer mu.Unlock()
 	defaultLogger = logger
+	mu.Unlock()
 }
 
 // GetLogger concurrently safe gets the default application logger.
 // Avoid using this function directly, and prefer getting the logger from the context instead,
 // i.e: someContext.Logger(ctx)
 func GetLogger() *zap.Logger {
-	mu.Lock()
-	defer mu.Unlock()
-	return defaultLogger
+	mu.RLock()
+	l := defaultLogger
+	mu.RUnlock()
+	return l
 }
 
 func Sync() {
