@@ -4,51 +4,37 @@ import (
 	"log"
 	"net/http"
 	"net/http/pprof"
-	"sync"
 	"time"
 )
 
 func main() {
-	// Start the pprof HTTP server
 	go func() {
-		log.Println(http.ListenAndServe(":8080", router()))
+		log.Fatalln(http.ListenAndServe(":8080", pprofRouter()))
 	}()
 
-	var wg sync.WaitGroup
-
 	for i := 0; i < 100; i++ {
-		wg.Add(1)
-		go func(id int) {
-			defer wg.Done()
-			performWork(id)
-		}(i)
-
-		time.Sleep(10 * time.Millisecond) // Simulate some delay between goroutine starts
+		go work()
+		time.Sleep(time.Second)
 	}
 
-	// Wait for all goroutines to finish
-	wg.Wait()
-
-	// Simulate running indefinitely
 	time.Sleep(10 * time.Minute)
 }
 
-func performWork(id int) {
+func work() {
 	for {
-		// Simulate CPU-bound work
-		busyWork()
-		time.Sleep(100 * time.Millisecond) // Sleep to simulate periodic work
+		getHot()
+		time.Sleep(100 * time.Millisecond)
 	}
 }
 
-func busyWork() {
+func getHot() {
 	sum := 0
-	for i := 0; i < 1e6; i++ { // Intensive CPU computation
+	for i := 0; i < 1e6; i++ {
 		sum += i
 	}
 }
 
-func router() http.Handler {
+func pprofRouter() http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/pprof/", pprof.Index)
 	mux.HandleFunc("/pprof/cmdline", pprof.Cmdline)

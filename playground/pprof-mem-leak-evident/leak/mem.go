@@ -11,21 +11,18 @@ type Resource struct {
 }
 
 func Process() {
-	// Simulate a streaming service
 	for i := 0; i < 1000; i++ {
 		r := &Resource{
 			id:   i,
-			data: make([]byte, 10*1024*1024), // 10MB
+			data: make([]byte, 10*1024*1024), // 10MiB
 		}
-
 		go func(res *Resource) {
 			for {
 				time.Sleep(1 * time.Second)
-				fmt.Println("Working on resource:", res.id)
-				// Goroutine never exits, holding onto the `res` forever
+				fmt.Println("Working on:", res.id)
 			}
 		}(r)
 
-		time.Sleep(time.Second) // Simulate a new resource processing every second
+		time.Sleep(time.Second)
 	}
 }

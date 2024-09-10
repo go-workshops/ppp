@@ -8,8 +8,7 @@ import (
 
 func Leak(_ context.Context, res *Resource) {
 	for {
-		time.Sleep(1 * time.Second)
-		fmt.Println("Working on resource:", res.id)
-		// Goroutine never exits, holding onto the `res` forever
+		time.Sleep(time.Second)
+		fmt.Println("Working on:", res.id)
 	}
 }
