@@ -295,18 +295,30 @@ func (p propagator) Inject(ctx context.Context, carrier propagation.TextMapCarri
 		return
 	}
 
+	// Pick one :P
+	// Custom headers
 	carrier.Set(TraceIDHeader, sc.TraceID().String())
 	carrier.Set(SpanIDHeader, sc.SpanID().String())
+	// Default headers
 	p.TraceContext.Inject(ctx, carrier)
 }
 
 func (p propagator) Extract(ctx context.Context, carrier propagation.TextMapCarrier) context.Context {
+	// Pick one :P
+	// Custom headers
 	traceIDHeader := carrier.Get(TraceIDHeader)
 	spanIDHeader := carrier.Get(SpanIDHeader)
+	// Default headers
 	traceContextCtx := p.TraceContext.Extract(ctx, carrier)
 	return sharedContext.WithSpanContext(traceContextCtx, traceIDHeader, spanIDHeader)
 }
 
 func (p propagator) Fields() []string {
-	return append(p.TraceContext.Fields(), TraceIDHeader, SpanIDHeader)
+	return append(
+		// Pick one :P
+		// Default headers
+		p.TraceContext.Fields(),
+		// Custom headers
+		TraceIDHeader, SpanIDHeader,
+	)
 }
